@@ -1,5 +1,30 @@
 import torch as t
 
+class ConvQuant(nn.Conv):
+    def __init__(self, in_ch, out_ch, isBase): # 输入，输出通道，卷积是否带base
+        super.__init__(in_ch, out_ch, isBase, staticStepNum)
+
+        self.weight_quant = Quant(in_ch, out_ch, isBase)
+        self.out_quant = Quant(in_ch, out_ch, isBase)
+
+        self.step = 0
+        self.staticStepNum = staticStepNum
+
+    def forward(self, x):
+        if self.step < self.staticStepNum:
+            self.weight_quant.init_static(x)
+        elif self.step == self.staticStepNum:
+            self.weight_quant.init(x)
+        out = self._conv_forward(x, self.weight)
+
+        if self.step
+
+        else:
+            quant_weight = self.weight_quant(self.weight)
+            out = self._conv_forward(x, quant_weight)
+            out = self.out_quant(out)
+        return out
+
 
 class Quantizer(t.nn.Module):
     def __init__(self, bit):
