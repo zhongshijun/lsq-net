@@ -5,24 +5,26 @@ class ConvQuant(nn.Conv):
         super.__init__(in_ch, out_ch, isBase, staticStepNum)
 
         self.weight_quant = Quant(in_ch, out_ch, isBase)
-        self.out_quant = Quant(in_ch, out_ch, isBase)
+        self.input_quant = Quant(in_ch, out_ch, isBase)
 
         self.step = 0
         self.staticStepNum = staticStepNum
 
     def forward(self, x):
-        if self.step < self.staticStepNum:
-            self.weight_quant.init_static(x)
-        elif self.step == self.staticStepNum:
-            self.weight_quant.init(x)
-        out = self._conv_forward(x, self.weight)
+        if self.init_flag:
+            if self.step < self.staticStepNum:
+                self.weight_quant.init_static(self.weight)
+                self.input_quant.init_static(x)
+            elif self.step == self.staticStepNum:
+                self.weight_quant.init(self.weight)
+                self.input_quant.init(x)
 
-        if self.step
-
+            out = self._conv_forward(x, self.weight, self.bias)
         else:
             quant_weight = self.weight_quant(self.weight)
-            out = self._conv_forward(x, quant_weight)
-            out = self.out_quant(out)
+            quant_input = self.input_quant(x)
+            out = self._conv_forward(quant_input, quant_weight, self.bias)
+
         return out
 
 
