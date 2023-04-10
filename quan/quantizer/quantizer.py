@@ -20,6 +20,7 @@ class ConvQuant(nn.Conv):
                 self.input_quant.init(x)
 
             out = self._conv_forward(x, self.weight, self.bias)
+            self.step += 1
         else:
             quant_weight = self.weight_quant(self.weight)
             quant_input = self.input_quant(x)
