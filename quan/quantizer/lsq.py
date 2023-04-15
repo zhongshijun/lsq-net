@@ -36,6 +36,7 @@ class LsqQuan(Quantizer):
         
         self.per_channel = per_channel
         self.shift = shift
+        self.init_flag = False
         self.s = t.nn.Parameter(t.ones(1))
         if shift:
             self.shift_value = t.nn.Paramter(t.ones(1))
@@ -59,6 +60,8 @@ class LsqQuan(Quantizer):
                 self.shift_value = x_max - self.thd_pos * shift_init
            
              self.s = t.nn.Parameter(x.detach().abs().mean() * 2 / (self.thd_pos ** 0.5))
+            
+        self.init_flag = True
 
     def forward(self, x):
         if self.per_channel:
