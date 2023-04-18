@@ -16,8 +16,8 @@ class ConvQuant(nn.Conv):
                 self.weight_quant.init_static(self.weight)
                 self.input_quant.init_static(x)
             elif self.step == self.staticStepNum:
-                self.weight_quant.init(self.weight)
-                self.input_quant.init(x)
+                self.weight_quant.init(self.step)
+                self.input_quant.init(self.step)
 
             out = self._conv_forward(x, self.weight, self.bias)
             self.step += 1
@@ -52,7 +52,7 @@ class TConvQuant(nn.Conv):
         else:
             quant_weight = self.weight_quant(self.weight)
             quant_input = self.input_quant(x)
-            out = F.conv_transpose(x, self.weight, self.bias, self.stride, )
+            out = F.conv_transpose2d(quant_input, quant_weight, self.bias, self.stride, self.dilation)
 
         return out
 
